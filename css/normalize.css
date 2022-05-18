@@ -1,0 +1,26 @@
+* {
+    box-sizing: border-box;
+}
+
+body {
+    margin: 0px;
+}
+
+ul {
+    margin: 0px;
+    padding: 0px;
+    list-style: none;
+}
+
+button, input {
+    border: none;
+    padding: 0px;
+    margin: 0px;
+    background: transparent;
+    font: inherit;
+    text-align: start;
+}
+
+button {
+    cursor: pointer;
+}
