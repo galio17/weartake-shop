@@ -138,6 +138,7 @@ addEventListener('click', event => {
         const searchInput = document.querySelector('.search-input');
         
         if(searchInput.value) {
+            const filterNavegationButton = document.querySelector('.filter-category');
             const regEx = new RegExp(searchInput.value, 'i');
             const filterProducts = data.filter(product => regEx.test(product.tag.toString()+product.nameItem));
 
@@ -147,8 +148,11 @@ addEventListener('click', event => {
             </div>
             `)
             
+            filterNavegationButton.classList.remove('filter-category');
             searchInput.value = '';
         } else {
+            const buttonAll = document.getElementById('all').parentElement;
+            buttonAll.classList.add('filter-category');
             loadProductList(data, showcase);
         }
     }
