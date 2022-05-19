@@ -1,21 +1,3 @@
-function loadProductList(products, target, html) {
-    const productList = document.createElement('ul');
-
-    productList.classList.add('product-list');
-
-    target.innerHTML = '';
-
-    if(products.length) {
-        target.appendChild(productList);
-        products.forEach(product => {
-            createProductCard(product, productList);
-        })
-    }
-    else {
-        target.innerHTML = (html) ? html : '';
-    }
-}
-
 function createProductCard(product, target) {
     const productCard = document.createElement('li')
     const productInfo = document.createElement('section');
@@ -59,6 +41,105 @@ function createProductCard(product, target) {
     `);
 }
 
+function loadProductList(products, target, html) {
+    const productList = document.createElement('ul');
+
+    productList.classList.add('product-list');
+
+    target.innerHTML = '';
+
+    if(products.length) {
+        target.appendChild(productList);
+        products.forEach(product => {
+            createProductCard(product, productList);
+        })
+    }
+    else {
+        target.innerHTML = (html) ? html : '';
+    }
+}
+
+function addProductToCart() {
+    const newCartProduct = data.find(product => product.id == event.composedPath()[2].id);
+    
+    cartProducts.push(newCartProduct);
+}
+
+function removeProductToCart() {
+}
+
+function createCart() {
+    let priceTotal = 0;
+
+    cartProducts.forEach(product => priceTotal += product.value);
+
+    loadProductList(cartProducts, cart, `
+            <div class="no-products">
+                <h2>Carrinho vázio</h2>
+                <p>Adicione itens</p>
+            </div>
+    `);
+
+    if(cartProducts.length) {
+        cart.insertAdjacentHTML("beforeend", `
+            <table class="cart-info">
+                <tbody>
+                    <tr class="products-quantity">
+                        <th>Quantidade:</th>
+                        <td>${cartProducts.length}</td>
+                    </tr>
+                    <tr class="products-price">
+                        <th>Total:</th>
+                        <td>R$ ${priceTotal.toFixed(2)}</td>
+                    </tr>
+                </tbody>
+            </table>
+        `);
+    }
+}
+
+function filterShowcaseByNavegation() {
+    const filterProducts = data.filter(product => product.tag.includes(event.target.innerHTML));
+    const filterButton = document.querySelector('.filter-category');
+    
+    filterButton.classList.remove('filter-category')
+    event.composedPath()[1].classList.add('filter-category');
+
+    if(event.target.id !== 'all') {
+            loadProductList(filterProducts, showcase, `
+            <div class="no-products">
+                <h2>Nenhum produto para a categoria ${event.target.innerHTML.toLowerCase()}</h2>
+            </div>
+            `);
+    }
+    else {
+        loadProductList(data, showcase);
+    }
+}
+
+function filterShowcaseBySearch() {
+    const searchInput = document.querySelector('.search-input');
+        
+    if(searchInput.value) {
+        const filterNavegationButton = document.querySelector('.filter-category');
+        const regEx = new RegExp(searchInput.value, 'i');
+        const filterProducts = data.filter(product => regEx.test(product.tag.toString()+product.nameItem));
+
+        loadProductList(filterProducts, showcase, `
+        <div class="no-products">
+        <h2>Não há produtos para a pesquisa "${searchInput.value}"</h2>
+        </div>
+        `)
+        
+        filterNavegationButton.classList.remove('filter-category');
+        searchInput.value = '';
+    } else {
+        const buttonAll = document.getElementById('all').parentElement;
+        buttonAll.classList.add('filter-category');
+        loadProductList(data, showcase);
+    }
+}
+
 const cartProducts = [];
 const showcase = document.getElementById('showcase');
 const cart = document.getElementById('cart');
@@ -75,85 +156,18 @@ addEventListener('click', event => {
     
     if(clickedButton('product-button')) {
         if(clickedButton('add-cart-button')) {
-            const newCartProduct = data.find(product => product.id == event.composedPath()[2].id);
-    
-            cartProducts.push(newCartProduct);
-    
+            addProductToCart();
         }
         else if(clickedButton('remove-cart-button')) {
-            const indexToRemove = cartProducts.findIndex(product => product.id == event.composedPath()[2].id)
-    
-            cartProducts.splice(indexToRemove, 1);
+            removeProductToCart();
         }
 
-        loadProductList(cartProducts, cart, `
-            <div class="no-products">
-                <h2>Carrinho vázio</h2>
-                <p>Adicione itens</p>
-            </div>
-        `);
-
-        let priceTotal = 0;
-        cartProducts.forEach(product => priceTotal += product.value);
-
-        if(cartProducts.length) {
-            cart.insertAdjacentHTML("beforeend", `
-                <table class="cart-info">
-                    <tbody>
-                        <tr class="products-quantity">
-                            <th>Quantidade:</th>
-                            <td>${cartProducts.length}</td>
-                        </tr>
-                        <tr class="products-price">
-                            <th>Total:</th>
-                            <td>R$ ${priceTotal.toFixed(2)}</td>
-                        </tr>
-                    </tbody>
-                </table>
-            `);
-        }
+        createCart();
     }
     else if(clickedButton('navegation-button')) {
-        const filterProducts = data.filter(product => product.tag.includes(event.target.innerHTML));
-        const navegationButtons = document.querySelectorAll('.navegation-button');
-        
-        navegationButtons.forEach(button => {
-            button.parentElement.classList.remove('filter-category');
-        });
-        
-        event.composedPath()[1].classList.add('filter-category');
-
-        if(event.target.id !== 'all') {
-             loadProductList(filterProducts, showcase, `
-                <div class="no-products">
-                    <h2>Nenhum produto para a categoria ${event.target.innerHTML.toLowerCase()}</h2>
-                </div>
-             `);
-        }
-        else {
-            loadProductList(data, showcase);
-        }
+        filterShowcaseByNavegation()
     }
     else if(clickedButton('search-button')) {
-        const searchInput = document.querySelector('.search-input');
-        
-        if(searchInput.value) {
-            const filterNavegationButton = document.querySelector('.filter-category');
-            const regEx = new RegExp(searchInput.value, 'i');
-            const filterProducts = data.filter(product => regEx.test(product.tag.toString()+product.nameItem));
-
-            loadProductList(filterProducts, showcase, `
-            <div class="no-products">
-            <h2>Não há produtos para a pesquisa "${searchInput.value}"</h2>
-            </div>
-            `)
-            
-            filterNavegationButton.classList.remove('filter-category');
-            searchInput.value = '';
-        } else {
-            const buttonAll = document.getElementById('all').parentElement;
-            buttonAll.classList.add('filter-category');
-            loadProductList(data, showcase);
-        }
+        filterShowcaseBySearch();
     }
 });
