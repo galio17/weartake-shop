@@ -105,7 +105,7 @@ function filterShowcaseByNavegation() {
     const filterProducts = data.filter(product => product.tag.includes(event.target.innerHTML));
     const filterButton = document.querySelector('.filter-category');
     
-    filterButton.classList.remove('filter-category')
+    if(filterButton) filterButton.classList.remove('filter-category')
     event.composedPath()[1].classList.add('filter-category');
 
     if(event.target.id !== 'all') {
