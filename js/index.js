@@ -66,6 +66,9 @@ function addProductToCart() {
 }
 
 function removeProductToCart() {
+    const indexToRemove = cartProducts.findIndex(product => product.id == event.composedPath()[2].id)
+    
+    cartProducts.splice(indexToRemove, 1);
 }
 
 function createCart() {
